@@ -15,7 +15,10 @@ below for more details
 
 ## Usage example: 
     import PyExchange
-    exchange = PyExchange.Exchange('YOUR API KEY HERE')
+
+    # Get a free API key from https://openexchangerates.org/signup/free
+    exchange = PyExchange.Exchange('YOUR API KEY HERE') 
+    
     a = exchange.withdraw(1000, 'USD')
     b = exchange.withdraw(1000, 'EUR')
     print a + b
