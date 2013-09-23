@@ -1,8 +1,10 @@
-# PyExchange : An unoffcial interface to the Open Exchange Rates API
+# PyExchange 
+### An unoffcial interface to the Open Exchange Rates API
 
 
-## Author: Ashok Fernandez - https://github.com/ashokfernandez/
-## Date  : 23 / 09 / 2013
+## Author
+[Ashok Fernandez](https://github.com/ashokfernandez/)
+
 
 ## Description: 
 Downloads the latest exchange rates from http://openexchangerates.org/ and saves them to a file. If the file can be
