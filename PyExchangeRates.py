@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------------------------------------------------
-# PyExchange : An unoffcial interface to the Open Exchange Rates API
+# PyExchangeRates : An unoffcial interface to the Open Exchange Rates API
 # -------------------------------------------------------------------------------------------------------------------
 # 
 # Author: Ashok Fernandez - https://github.com/ashokfernandez/
@@ -13,8 +13,8 @@
 # below for more details
 # 
 # Usage example: 
-# >>> import PyExchange
-# >>> exchange = PyExchange.Exchange('YOUR API KEY HERE')
+# >>> import PyExchangeRates
+# >>> exchange = PyExchangeRates.Exchange('YOUR API KEY HERE')
 # >>> a = exchange.withdraw(1000, 'USD')
 # >>> b = exchange.withdraw(1000, 'EUR')
 # >>> print a + b
