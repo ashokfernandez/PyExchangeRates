@@ -376,6 +376,14 @@ class Exchange(object):
     def withdraw(self, amount, currencyKey):
         ''' Creates a money object that points to this exchange with the given amount of the given currency '''
         
+        # Check the amount is a numeric value
+        if not (isinstance(amount, int) or isinstance(amount,float) or isinstance(amount,long)):
+            raise TypeError('Amount must be of type int, float or long not %s' % type(amount))
+
+        # Check the currency key is a string
+        if not (isinstance(currencyKey, str)):
+            raise TypeError('Currency key must be of type str not %s' % type(amount))
+
         # Convert the key to uppercase
         currencyKey = currencyKey.upper()
 
