@@ -382,7 +382,7 @@ class Exchange(object):
 
         # Check the currency key is a string
         if not (isinstance(currencyKey, str)):
-            raise TypeError('Currency key must be of type str not %s' % type(amount))
+            raise TypeError('Currency key must be of type str not %s' % type(currencyKey))
 
         # Convert the key to uppercase
         currencyKey = currencyKey.upper()
