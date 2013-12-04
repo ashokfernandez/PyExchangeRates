@@ -12,6 +12,10 @@
 # and division - with the results always being in USD. Money values can be converted to other currencies. See the example
 # below for more details
 # 
+# Licence: 
+# Copyright Ashok Fernandez 2013
+# Released under the MIT license - http://opensource.org/licenses/MIT
+# 
 # Usage example: 
 # >>> import PyExchangeRates
 # >>> exchange = PyExchangeRates.Exchange('YOUR API KEY HERE')
@@ -85,7 +89,7 @@ def debug(message):
 # --------------------------------------------------------------------------------------------------------------------
 # EXCEPTIONS
 # --------------------------------------------------------------------------------------------------------------------
-# 
+
 class AccessDataFailure(Exception):
     ''' Exception for when there is no data on the currencies - either from file or from the internet   '''
     pass
