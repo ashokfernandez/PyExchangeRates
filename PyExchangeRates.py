@@ -44,16 +44,17 @@
 # -------------------------------------------------------------------------------------------------------------------
 
 try: # Python3
-  from urllib.request import urlopen
-  from urllib.error import URLError, HTTPError
+    from urllib.request import urlopen
+    from urllib.error import URLError, HTTPError
 except ImportError: # Python2
-  from urllib2 import urlopen, URLError, HTTPError
-  import sys     # sys.setdefaultencoding is cancelled by site.py
-  reload(sys)    # to re-enable sys.setdefaultencoding()
-  sys.setdefaultencoding('utf-8')
+    from urllib2 import urlopen, URLError, HTTPError
+    import sys     # sys.setdefaultencoding is cancelled by site.py
+    reload(sys)    # to re-enable sys.setdefaultencoding()
+    sys.setdefaultencoding('utf-8')
 import json                       # Allows the data to be decoded
 from datetime import datetime     # For timestamping
 import time                       # For timestamping
+import numbers                    # For detecting if number
 
 # --------------------------------------------------------------------------------------------------------------------
 # CONSTANTS
@@ -213,7 +214,7 @@ class Money(object):
 
         # Allow scalar multiplication 
         elif isinstance(other,int) or isinstance(other,float):
-            currentAmount = self.getAmount()
+            currentAmount = self.convert(UNITED_STATES_DOLLARS_KEY).getAmount()
             newAmount = currentAmount * other
             return Money(newAmount, UNITED_STATES_DOLLARS_KEY, self.exchange)
         
@@ -234,13 +235,17 @@ class Money(object):
 
         # Allow scalar multiplication 
         elif isinstance(other,int) or isinstance(other,float):
-            currentAmount = self.getAmount()
+            currentAmount = self.convert(UNITED_STATES_DOLLARS_KEY).getAmount()
             newAmount = currentAmount / other
             return Money(newAmount, UNITED_STATES_DOLLARS_KEY, self.exchange)
         
         # Throw an exception if an amount is given that isn't a Money object
         else:
             raise TypeError("unsupported operand type(s) for /: '%s' and '%s'" % (type(self), type(other)))
+
+    # Division wrapper for Python3
+    def __truediv__(self, other):
+        return self.__div__(other)
 
 class Exchange(object):
     ''' Object to store currencies and update them with the OpenExchangeRates API'''
@@ -380,7 +385,7 @@ class Exchange(object):
         ''' Creates a money object that points to this exchange with the given amount of the given currency '''
         
         # Check the amount is a numeric value
-        if not (isinstance(amount, int) or isinstance(amount,float) or isinstance(amount,long)):
+        if not issubclass(amount.__class__, numbers.Number) or isinstance(amount, bool):
             raise TypeError('Amount must be of type int, float or long not %s' % type(amount))
 
         # Check the currency key is a string
