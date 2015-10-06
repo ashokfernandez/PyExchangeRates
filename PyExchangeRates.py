@@ -43,8 +43,14 @@
 # 1061.079000 AUD
 # -------------------------------------------------------------------------------------------------------------------
 
-import urllib.request             # For downloading the currency data
-import urllib.error               # For network-handling errors
+try: # Python3
+  from urllib.request import urlopen
+  from urllib.error import URLError, HTTPError
+except ImportError: # Python2
+  from urllib2 import urlopen, URLError, HTTPError
+  import sys     # sys.setdefaultencoding is cancelled by site.py
+  reload(sys)    # to re-enable sys.setdefaultencoding()
+  sys.setdefaultencoding('utf-8')
 import json                       # Allows the data to be decoded
 from datetime import datetime     # For timestamping
 import time                       # For timestamping
@@ -69,9 +75,9 @@ def internet_on():
     connectionAvaliable = False
     try:
         # Check if Google is online
-        response = urllib.request.urlopen('http://www.google.com',timeout=5)
+        response = urlopen('http://www.google.com',timeout=5)
         connectionAvaliable = True
-    except urllib.error.URLError as err: 
+    except URLError as err: 
         # Connection failed, either Google is down or more likely the internet connection is down
         pass
     
@@ -339,12 +345,12 @@ class Exchange(object):
         # Get the latest currency rates from the API
         try:
             # Get the latest rates
-            latestValues = urllib.request.urlopen(BASE_URL + GET_LATEST + API_KEY)
+            latestValues = urlopen(BASE_URL + GET_LATEST + API_KEY)
             latestValuesJSON = latestValues.read().decode("utf-8") 
             latestValuesDecoded = json.loads(latestValuesJSON)
 
             # Get the names for the rates
-            currencyNames = urllib.request.urlopen(BASE_URL + GET_NAMES + API_KEY)
+            currencyNames = urlopen(BASE_URL + GET_NAMES + API_KEY)
             currencyNamesJSON = currencyNames.read().decode("utf-8") 
             currencyNamesDecoded = json.loads(currencyNamesJSON)
             
@@ -366,7 +372,7 @@ class Exchange(object):
             self.lastUpdated = time.time()
 
         # Handle bad app ID keys
-        except urllib.error.HTTPError as e:
+        except HTTPError as e:
             if e.code == 401:
                 raise BadAppID("%s is an invalid app ID for openexchangerates.org" % self.appID)
 
