@@ -21,36 +21,40 @@
 # >>> exchange = PyExchangeRates.Exchange('YOUR API KEY HERE')
 # >>> a = exchange.withdraw(1000, 'USD')
 # >>> b = exchange.withdraw(1000, 'EUR')
-# >>> print a + b
+# >>> print(a + b)
 # 2352.363797 USD
 #
-# >>> print a - b
+# >>> print(a - b)
 # -352.363797 USD
 #
-# >>> print a * b
+# >>> print(a * b)
 # 1352363.796680 USD
 #
-# >>> print a * 2
+# >>> print(a * 2)
 # 2000.000000 USD
 #
-# >>> print a + b
+# >>> print(a + b)
 # 2352.363797 USD
 #
-# >>> print b / 2
+# >>> print(b / 2)
 # 500.000000 USD
 #
-# >>> print a.convert('AUD')
+# >>> print(a.convert('AUD'))
 # 1061.079000 AUD
 # -------------------------------------------------------------------------------------------------------------------
 
-import urllib2                    # For downloading the currency data
+try: # Python3
+    from urllib.request import urlopen
+    from urllib.error import URLError, HTTPError
+except ImportError: # Python2
+    from urllib2 import urlopen, URLError, HTTPError
+    import sys     # sys.setdefaultencoding is cancelled by site.py
+    reload(sys)    # to re-enable sys.setdefaultencoding()
+    sys.setdefaultencoding('utf-8')
 import json                       # Allows the data to be decoded
 from datetime import datetime     # For timestamping
 import time                       # For timestamping
-
-import sys                        # Fixes Unicode encoding error
-reload(sys)                       # ...
-sys.setdefaultencoding("utf-8")   # ...
+import numbers                    # For detecting if number
 
 # --------------------------------------------------------------------------------------------------------------------
 # CONSTANTS
@@ -71,10 +75,10 @@ def internet_on():
     ''' Returns True if the internet is avaliable, otherwise returns false'''
     connectionAvaliable = False
     try:
-        # Check if Google is online, use the direct IP to avoid DNS lookup delays
-        response = urllib2.urlopen('http://74.125.228.100',timeout=5)
+        # Check if Google is online
+        response = urlopen('http://www.google.com',timeout=5)
         connectionAvaliable = True
-    except urllib2.URLError as err: 
+    except URLError as err: 
         # Connection failed, either Google is down or more likely the internet connection is down
         pass
     
@@ -84,7 +88,7 @@ def internet_on():
 def debug(message):
     ''' Prints debugging messages if debug mode is set to true'''
     if DEBUG_MODE:
-        print message
+        print(message)
 
 # --------------------------------------------------------------------------------------------------------------------
 # EXCEPTIONS
@@ -210,7 +214,7 @@ class Money(object):
 
         # Allow scalar multiplication 
         elif isinstance(other,int) or isinstance(other,float):
-            currentAmount = self.getAmount()
+            currentAmount = self.convert(UNITED_STATES_DOLLARS_KEY).getAmount()
             newAmount = currentAmount * other
             return Money(newAmount, UNITED_STATES_DOLLARS_KEY, self.exchange)
         
@@ -231,7 +235,7 @@ class Money(object):
 
         # Allow scalar multiplication 
         elif isinstance(other,int) or isinstance(other,float):
-            currentAmount = self.getAmount()
+            currentAmount = self.convert(UNITED_STATES_DOLLARS_KEY).getAmount()
             newAmount = currentAmount / other
             return Money(newAmount, UNITED_STATES_DOLLARS_KEY, self.exchange)
         
@@ -239,9 +243,9 @@ class Money(object):
         else:
             raise TypeError("unsupported operand type(s) for /: '%s' and '%s'" % (type(self), type(other)))
 
-    
-
-
+    # Division wrapper for Python3
+    def __truediv__(self, other):
+        return self.__div__(other)
 
 class Exchange(object):
     ''' Object to store currencies and update them with the OpenExchangeRates API'''
@@ -346,13 +350,13 @@ class Exchange(object):
         # Get the latest currency rates from the API
         try:
             # Get the latest rates
-            latestValues = urllib2.urlopen(BASE_URL + GET_LATEST + API_KEY)
-            latestValuesJSON = latestValues.read()
+            latestValues = urlopen(BASE_URL + GET_LATEST + API_KEY)
+            latestValuesJSON = latestValues.read().decode("utf-8") 
             latestValuesDecoded = json.loads(latestValuesJSON)
 
             # Get the names for the rates
-            currencyNames = urllib2.urlopen(BASE_URL + GET_NAMES + API_KEY)
-            currencyNamesJSON = currencyNames.read()
+            currencyNames = urlopen(BASE_URL + GET_NAMES + API_KEY)
+            currencyNamesJSON = currencyNames.read().decode("utf-8") 
             currencyNamesDecoded = json.loads(currencyNamesJSON)
             
             # Extract the base curreny name
@@ -373,7 +377,7 @@ class Exchange(object):
             self.lastUpdated = time.time()
 
         # Handle bad app ID keys
-        except urllib2.HTTPError as e:
+        except HTTPError as e:
             if e.code == 401:
                 raise BadAppID("%s is an invalid app ID for openexchangerates.org" % self.appID)
 
@@ -381,7 +385,7 @@ class Exchange(object):
         ''' Creates a money object that points to this exchange with the given amount of the given currency '''
         
         # Check the amount is a numeric value
-        if not (isinstance(amount, int) or isinstance(amount,float) or isinstance(amount,long)):
+        if not issubclass(amount.__class__, numbers.Number) or isinstance(amount, bool):
             raise TypeError('Amount must be of type int, float or long not %s' % type(amount))
 
         # Check the currency key is a string
@@ -398,9 +402,3 @@ class Exchange(object):
         # If it is return the Money requested
         else:
             return Money(amount, currencyKey, self)
-        
-        
-
-    
-    
-    
