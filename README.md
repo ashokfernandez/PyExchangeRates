@@ -5,7 +5,9 @@
 ## Author
 [Ashok Fernandez](https://github.com/ashokfernandez/)
 
-
+#### With Thanks To
+[Will Webberley](https://github.com/flyingsparx) for adding Python 3 support and fixing bug with scalar multiplication and division.
+ 
 ## Description: 
 Downloads the latest exchange rates from http://openexchangerates.org/ and saves them to a file. If the file can be
 found the module will load the rates from the file if the file is less than one day old. Otherwise the file is updated
